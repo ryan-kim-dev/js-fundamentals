@@ -297,12 +297,32 @@ window.Object === Object; // true
   2.  객체에 추가할 프로퍼티 목록이 인수로 전달된 경우 프로퍼티를 객체에 추가한다.
   3.  인수로 전달받은 프로토타입을 객체의 `[[Prototype]]` 내부 슬롯에 할당한다.
 - 결국 프로토타입은 추상 연산 OrdinaryObjectCreate에 전달되는 인수에 의해 결정되며, 이 인수는 객체가 생성되는 시점에 객체 생성 방식에 의해 결정되는 것이다.
+  - 객체 리터럴에 의해 생성된 객체의 프로토타입은 `Object.prototype`이다.
+  - Object 생성자 함수에 의해 생성된 객체의 프로토타입은 `Object.prototype`이다.
+  - 생성자 함수에 의해 생성된 객체의 프로토타입은 생성자 함수의 `prototype` 프로퍼티에 바인딩된 객체이다.
 
 ### 19.6.1 객체 리터럴에 의해 생성된 객체의 프로토타입
 
+- JS 엔진은 객체 리터럴을 평가하여 객체를 생성할 때 `Object.prototype`을 추상 연산 OrdinaryObjectCreate의 인수로 전달한다.
+- 따라서 객체 리터럴에 의해 생성된 객체의 프로토타입은 `Object.prototype`이다.
+- 객체 리터럴에 의해 생성된 객체는 `constructor` 프로퍼티나 `hasOwnProperty` 메서드 등을 소유하지 않지만, `Object.prototype` 객체가 소유한 프로퍼티와 메서드를 상속받아 사용할 수 있다.
+
+```js
+const obj = { x: 1 };
+obj.constructor === Object; // true
+obj.hasOwnProperty('x'); // true
+```
+
 ### 19.6.2 Object 생성자 함수에 의해 생성된 객체의 프로토타입
 
+- JS 엔진은 Object 생성자 함수를 호출하여 객체를 생성할 때 `Object.prototype`을 추상 연산 OrdinaryObjectCreate의 인수로 전달한다.
+- 따라서 Object 생성자 함수에 의해 생성된 객체의 프로토타입은 `Object.prototype`이다.
+
 ### 19.6.3 생성자 함수에 의해 생성된 객체의 프로토타입
+
+- JS 엔진은 `new` 연산자와 함께 생성자 함수를 호출하여 객체를 생성할 때 생성자 함수의 prototype 프로퍼티에 바인딩된 객체를 추상 연산 OrdinaryObjectCreate의 인수로 전달한다.
+- 따라서 생성자 함수에 의해 생성된 객체의 프로토타입은 생성자 함수의 `prototype` 프로퍼티에 바인딩된 객체이다.
+- `Object` 생성자 함수와 더불어 생성된 프로토타입 `Object.prototype`은 `hasOwnProperty` 등 다양한 빌트인 메서드를 갖고 있지만, 사용자 정의 생성자 함수와 더불어 생성된 프로토타입 (ex: `Person.prototype`)의 프로퍼티는 `constructor` 프로퍼티 하나뿐이다.
 
 ## 19.7 프로토타입 체인
 
