@@ -25,10 +25,10 @@
 ```js
 // 메서드 중복 생성 예시
 function Circle(radius) {
-  this.radius = radius;
-  this.getArea = function () {
-    return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
-  };
+	this.radius = radius;
+	this.getArea = function () {
+		return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
+	};
 }
 
 const circle1 = new Circle(1);
@@ -40,10 +40,10 @@ console.log(circle1.getArea === circle2.getArea); // false
 ```js
 // 상속에 의한 메서드 공유 예시
 function Circle(radius) {
-  this.radius = radius;
-  Circle.prototype.getArea = function () {
-    return Math.PI * this.radius ** 2;
-  };
+	this.radius = radius;
+	Circle.prototype.getArea = function () {
+		return Math.PI * this.radius ** 2;
+	};
 }
 
 const circle1 = new Circle(1);
@@ -70,7 +70,7 @@ obj.__proto__; // {constructor: ƒ, __defineGetter__: ƒ, __defineSetter__: ƒ, 
 
 // 생성자 함수에 의해 생성된 객체의 프로토타입은 생성자 함수의 `prototype` 프로퍼티에 바인딩된 객체이다.
 function User(name) {
-  this.name = name;
+	this.name = name;
 }
 const user1 = new User('kim');
 user1.__proto__ === User.prototype; // true
@@ -89,7 +89,7 @@ user1.__proto__; // {constructor: ƒ}
 ```js
 // 생성자 함수
 function Person(name) {
-  this.name = name;
+	this.name = name;
 }
 
 // 생성자 함수 Person에 의해 생성된 객체는 Person.prototype을 자신의 프로토타입으로 갖는다.
@@ -102,7 +102,7 @@ console.log(me.__proto__.constructor === Person); // true
 
 // 프로토타입 상속
 Person.prototype.sayHi = function () {
-  console.log(`Hi! My name is ${this.name}`);
+	console.log(`Hi! My name is ${this.name}`);
 };
 
 me.sayHi(); // Hi! My name is Kim
@@ -115,7 +115,7 @@ Object.getOwnPropertyDescriptors(me); // {name: {…}}
 
 ```js
 function Person(name) {
-  this.name = name;
+	this.name = name;
 }
 
 console.log(Person.__proto__); // ƒ () { [native code] }
@@ -158,7 +158,7 @@ console.log(obj.__proto__ === Object.prototype); // true
 
 ```js
 function Person(name) {
-  this.name = name;
+	this.name = name;
 }
 
 const p1 = new Person('Kim');
@@ -171,8 +171,8 @@ p1.__proto__ === Object.getPrototypeOf(p1); // true
 일반 객체는 `prototype` 프로퍼티를 소유하지 않는다.
 
 ```js
-(function () {}.hasOwnProperty('prototype')); // true
-({}.hasOwnProperty('prototype')); // false
+(function () {}).hasOwnProperty('prototype'); // true
+({}).hasOwnProperty('prototype'); // false
 [].hasOwnProperty('prototype'); // false
 ```
 
@@ -182,29 +182,121 @@ p1.__proto__ === Object.getPrototypeOf(p1); // true
 ```js
 // 화살표 함수
 const Car = (brand) => {
-  this.brand = brand;
+	this.brand = brand;
 };
 Car.hasOwnProperty('prototype'); // false
+Car.prototype; // undefined
 
 // ES6 메서드 축약 표현
 const obj = {
-  foo() {},
+	foo() {},
 };
 
 obj.foo.hasOwnProperty('prototype'); // false
+obj.foo.prototype; // undefined
 ```
 
 ### 19.3.3 프로토타입의 `constructor` 프로퍼티와 생성자 함수
 
+- 모든 프로토타입은 `constructor` 프로퍼티를 갖는다.
+- 프로토타입은 자신의 `constructor` 프로퍼티를 통해 생성자 함수에 접근할 수 있다.
+- `constructor` 프로퍼티는 `prototype` 프로퍼티로 자신을 참조하고 있는 생성자 함수를 가리킨다. 이 연결은 생성자 함수 객체가 생성될 때 이뤄진다.
+  - `me.constructor === Person; // true`
+  - `Person.prototype.constructor === Person; // true`
+  - `Person.constructor === Function; // true`
+- 생성자 함수의 `prototype` 프로퍼티는 자신이 생성할 인스턴스의 프로토타입을 가리킨다.
+  - `Person.prototype === me.__proto__; // true`
+
+```js
+function Person(name) {
+	this.name = name;
+}
+
+const me = new Person('Kim');
+
+// 프로토타입은 자신의 constructor 프로퍼티를 통해 생성자 함수에 접근할 수 있다.
+me.__proto__.constructor === Person; // true
+
+// 생성자 함수의 prototype 프로퍼티는 자신이 생성할 인스턴스의 프로토타입을 가리킨다.
+Person.prototype === me.__proto__; // true
+
+// constructor 프로퍼티는 prototype 프로퍼티로 자신을 참조하고 있는 생성자 함수를 가리킨다.
+Person.prototype.constructor === Person; // true
+Person.constructor === Function; // true
+
+// me 객체에는 constructor 프로퍼티가 없지만
+// me 객체의 프로토타입인 Person.prototype 객체에는 constructor 프로퍼티가 있다.
+// 따라서 me 객체는 Person.prototype 객체의 constructor 프로퍼티를 상속받아 사용할 수 있다.
+me.constructor === Person; // true
+```
+
 ## 19.4 리터럴 표기법에 의해 생성된 객체의 생성자 함수와 프로토타입
+
+앞서 살펴본 것 처럼 생성자 함수에 의해 생성된 인스턴스는 프로토타입의 `constructor` 프로퍼티에 의해 생성자 함수와 연결되고, `constructor` 프로퍼티는 인스턴스를 생성한 생성자 함수를 가리킨다.
+
+```js
+function Person(name) {
+	this.name = name;
+}
+const me = new Person('Kim');
+me.constructor === Person; // true
+```
+
+하지만 객체 리터럴에 의해 생성된 객체의 경우 프로토타입의 `constructor` 프로퍼티가 가리키는 생성자 함수라고 단정할 수는 없다. `Object` 생성자 함수 호출과 객체 리터럴의 평가는 추상 연산 OrdinaryObjectCreate를 호출하여 빈 객체를 생성하는 것은 동일하지만 `new.target`의 확인이나 프로퍼티 추가의 처리 등 세부 내용이 다르다. 객체 리터럴에 의해 생성된 객체는 `Object` 생성자 함수와 연결되어 있지만 `Object` 생성자 함수가 생성한 것은 아니다.
+하지만, 리터럴 표기법에 의해 생성된 객체도 상속을 위해 프로토타입이 필요하기 때문에 리터럴 표기법에 의해 생성된 객체도 **가상적인 생성자 함수를 갖는다.** 프로토타입은 생성자 함수와 더불어 생성되며, `prototype`, `constructor` 프로퍼티에 의해 연결되어 있기 때문이다.
+즉 프로토타입과 생성자 함수는 단독으로 존재할 수 없고 언제나 쌍으로 존재한다.
+
+- 객체 리터럴
+  - 생성자 함수 : `Object`
+  - 프로토타입 : `Object.prototype`
+- 함수 리터럴
+  - 생성자 함수 : `Function`
+  - 프로토타입 : `Function.prototype`
+- 배열 리터럴
+  - 생성자 함수 : `Array`
+  - 프로토타입 : `Array.prototype`
+- 정규 표현식 리터럴
+  - 생성자 함수 : `RegExp`
+  - 프로토타입 : `RegExp.prototype`
 
 ## 19.5 프로토타입의 생성 시점
 
-### 19.5.1 사용자 정의 생성자 함수와 프로토타입 생성 시점
+프로토타입은 생성자 함수가 생성되는 시점에 더불어 생성된다.
+사용자가 정의한 생성자 함수와 빌트인 생성자 함수의 생성자 함수 객체가 생성되는 시점이 다름에 유의하자.
 
-### 19.5.2 빌트인 생성자 함수와 프로토타입 생성 시점
+사용자 정의 생성자 함수는 자신이 평가되어 함수 객체로 생성되는 시점에 프로토타입도 더불어 생성되며, 생성된 프로토타입의 프로토타입은 언제나 `Object.prototype`이다.
+
+```js
+function Person(name) {
+	this.name = name;
+}
+Person.prototype.__proto__ === Object.prototype; // true
+```
+
+모든 빌트인 생성자 함수는 전역 객체가 생성되는 지점에 생성되며, 이 때 더불어 생성된 프로토타입은 빌트인 생성자 함수의 `prototype` 프로퍼티에 바인딩된다.
+
+```js
+// 브라우저 환경에서 실행
+// 빌트인 객체인 Object는 전역 객체 window의 프로퍼티다.
+window.Object === Object; // true
+```
+
+사용자 정의 생성자 함수는 런타임 이전 소스코드 평가 과정에서 함수 정의가 평가되어 함수 객체가 될 때 프로토타입도 더불어 생성된다.
+빌트인 생성자 함수는 런타임 이전 JS 엔진에 의해 전역 객체가 생성되는 시점에 더불어 생성된다. 빌트인 생성자 함수도 일반 함수처럼 빌트인 생성자 함수가 생성되는 시점에 프로토타입이 생성되며, 생성된 프로토타입은 빌트인 생성자 함수의 `prototype` 프로퍼티에 바인딩된다.
+
+즉 어떤 생성자 함수이건 간에 객체가 생성되기 이전에 생성자 함수와 프로토타입은 이미 객체화되어 존재한다. 런타임 이전에 해당 프로토타입 객체가 메모리에 준비되어 있다는 의미이다.
+이렇게 준비된 프로토타입은 이후 생성자 함수 또는 리터럴 표기법으로 객체를 생성하면 생성된 객체의 `[[Prototype]]` 내부 슬롯에 할당된다. 이로써 생성된 객체는 프로토타입을 상속받아 공통으로 사용할 프로퍼티나 메서드를 사용할 수 있게 된다.
 
 ## 19.6 객체 생성 방식과 프로토타입의 결정
+
+객체는 객체 리터럴, Object 생성자 함수, 생성자 함수, Object.create 메서드, ES6 클래스 등 다양한 셍성 방법이 있는데, 세부적인 차이는 있지만 생성되는 객체는 모두 추상 연산 OrdinaryObjectCreate에 의해 생성된다.
+
+- 추상 연산 OrdinaryObjectCreate는 필수로 자신이 생성할 객체의 프로토타입을 인수로 전달받는다.
+- 추상 연산 OrdinaryObjectCreate 동작과정
+  1.  빈 객체를 생성한다.
+  2.  객체에 추가할 프로퍼티 목록이 인수로 전달된 경우 프로퍼티를 객체에 추가한다.
+  3.  인수로 전달받은 프로토타입을 객체의 `[[Prototype]]` 내부 슬롯에 할당한다.
+- 결국 프로토타입은 추상 연산 OrdinaryObjectCreate에 전달되는 인수에 의해 결정되며, 이 인수는 객체가 생성되는 시점에 객체 생성 방식에 의해 결정되는 것이다.
 
 ### 19.6.1 객체 리터럴에 의해 생성된 객체의 프로토타입
 
@@ -235,7 +327,3 @@ obj.foo.hasOwnProperty('prototype'); // false
 ## 19.13 프로퍼티 존재 확인
 
 ## 19.14 프로퍼티 열거
-
-```
-
-```
