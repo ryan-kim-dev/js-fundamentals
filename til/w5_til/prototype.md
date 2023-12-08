@@ -25,10 +25,10 @@
 ```js
 // 메서드 중복 생성 예시
 function Circle(radius) {
-	this.radius = radius;
-	this.getArea = function () {
-		return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
-	};
+  this.radius = radius;
+  this.getArea = function () {
+    return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
+  };
 }
 
 const circle1 = new Circle(1);
@@ -40,10 +40,10 @@ console.log(circle1.getArea === circle2.getArea); // false
 ```js
 // 상속에 의한 메서드 공유 예시
 function Circle(radius) {
-	this.radius = radius;
-	Circle.prototype.getArea = function () {
-		return Math.PI * this.radius ** 2;
-	};
+  this.radius = radius;
+  Circle.prototype.getArea = function () {
+    return Math.PI * this.radius ** 2;
+  };
 }
 
 const circle1 = new Circle(1);
@@ -70,7 +70,7 @@ obj.__proto__; // {constructor: ƒ, __defineGetter__: ƒ, __defineSetter__: ƒ, 
 
 // 생성자 함수에 의해 생성된 객체의 프로토타입은 생성자 함수의 `prototype` 프로퍼티에 바인딩된 객체이다.
 function User(name) {
-	this.name = name;
+  this.name = name;
 }
 const user1 = new User('kim');
 user1.__proto__ === User.prototype; // true
@@ -89,7 +89,7 @@ user1.__proto__; // {constructor: ƒ}
 ```js
 // 생성자 함수
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 // 생성자 함수 Person에 의해 생성된 객체는 Person.prototype을 자신의 프로토타입으로 갖는다.
@@ -102,7 +102,7 @@ console.log(me.__proto__.constructor === Person); // true
 
 // 프로토타입 상속
 Person.prototype.sayHi = function () {
-	console.log(`Hi! My name is ${this.name}`);
+  console.log(`Hi! My name is ${this.name}`);
 };
 
 me.sayHi(); // Hi! My name is Kim
@@ -115,7 +115,7 @@ Object.getOwnPropertyDescriptors(me); // {name: {…}}
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 console.log(Person.__proto__); // ƒ () { [native code] }
@@ -148,7 +148,51 @@ console.log(obj.__proto__ === Object.prototype); // true
 
 #### `__proto__` 접근자 프로퍼티를 코드 내에서 직접 사용하는 것은 권장하지 않는다.
 
+모든 객체가 `__proto__` 접근자 프로퍼티를 사용할수 있는 것은 아니기 때문이다.
+직접 상속을 통해 생성되어 `Object.prototype` 을 상속받지 않는 객체는 `__proto__` 접근자 프로퍼티를 사용할 수 없다.
+따라서 프로토타입 참조 시 `Object.getPrototypeOf` 메서드, 프로토타입 교체 시 `Object.setPrototypeOf` 메서드를 사용하는 것이 권장된다.
+
 ### 19.3.2 함수 객체의 `prototype` 프로퍼티
+
+(생성자 함수로 호출할 수 있는)함수 객체만이 소유하는 `prototype` 프로퍼티는 생성자 함수가 생성할 **인스턴스의 프로토타입**을 가리킨다.
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+const p1 = new Person('Kim');
+
+Person.prototype === Object.getPrototypeOf(p1); // true
+Person.prototype === p1.__proto__; // true
+p1.__proto__ === Object.getPrototypeOf(p1); // true
+```
+
+일반 객체는 `prototype` 프로퍼티를 소유하지 않는다.
+
+```js
+(function () {}.hasOwnProperty('prototype')); // true
+({}.hasOwnProperty('prototype')); // false
+[].hasOwnProperty('prototype'); // false
+```
+
+`non-constructor`인 화살표 함수와 ES6 메서드 축약 표현으로 정의한 메서드는 `prototype` 프로퍼티를 소유하지 않는다. 또한 프로토타입도 생성하지 않는다.
+`prototype` 프로퍼티는 생성자 함수가 생성할 인스턴스의 프로토타입을 가리키는데, 화살표 함수와 ES6 메서드 축약 표현으로 정의한 메서드는 생성자 함수로 호출할 수 없다. 따라서 인스턴스를 생성할 수 없으므로 프로토타입도 생성하지 않는다.
+
+```js
+// 화살표 함수
+const Car = (brand) => {
+  this.brand = brand;
+};
+Car.hasOwnProperty('prototype'); // false
+
+// ES6 메서드 축약 표현
+const obj = {
+  foo() {},
+};
+
+obj.foo.hasOwnProperty('prototype'); // false
+```
 
 ### 19.3.3 프로토타입의 `constructor` 프로퍼티와 생성자 함수
 
