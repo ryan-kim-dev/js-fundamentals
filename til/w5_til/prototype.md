@@ -25,10 +25,10 @@
 ```js
 // 메서드 중복 생성 예시
 function Circle(radius) {
-	this.radius = radius;
-	this.getArea = function () {
-		return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
-	};
+  this.radius = radius;
+  this.getArea = function () {
+    return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
+  };
 }
 
 const circle1 = new Circle(1);
@@ -40,10 +40,10 @@ console.log(circle1.getArea === circle2.getArea); // false
 ```js
 // 상속에 의한 메서드 공유 예시
 function Circle(radius) {
-	this.radius = radius;
-	Circle.prototype.getArea = function () {
-		return Math.PI * this.radius ** 2;
-	};
+  this.radius = radius;
+  Circle.prototype.getArea = function () {
+    return Math.PI * this.radius ** 2;
+  };
 }
 
 const circle1 = new Circle(1);
@@ -70,7 +70,7 @@ obj.__proto__; // {constructor: ƒ, __defineGetter__: ƒ, __defineSetter__: ƒ, 
 
 // 생성자 함수에 의해 생성된 객체의 프로토타입은 생성자 함수의 `prototype` 프로퍼티에 바인딩된 객체이다.
 function User(name) {
-	this.name = name;
+  this.name = name;
 }
 const user1 = new User('kim');
 user1.__proto__ === User.prototype; // true
@@ -89,7 +89,7 @@ user1.__proto__; // {constructor: ƒ}
 ```js
 // 생성자 함수
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 // 생성자 함수 Person에 의해 생성된 객체는 Person.prototype을 자신의 프로토타입으로 갖는다.
@@ -102,7 +102,7 @@ console.log(me.__proto__.constructor === Person); // true
 
 // 프로토타입 상속
 Person.prototype.sayHi = function () {
-	console.log(`Hi! My name is ${this.name}`);
+  console.log(`Hi! My name is ${this.name}`);
 };
 
 me.sayHi(); // Hi! My name is Kim
@@ -115,7 +115,7 @@ Object.getOwnPropertyDescriptors(me); // {name: {…}}
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 console.log(Person.__proto__); // ƒ () { [native code] }
@@ -158,7 +158,7 @@ console.log(obj.__proto__ === Object.prototype); // true
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 const p1 = new Person('Kim');
@@ -171,8 +171,8 @@ p1.__proto__ === Object.getPrototypeOf(p1); // true
 일반 객체는 `prototype` 프로퍼티를 소유하지 않는다.
 
 ```js
-(function () {}).hasOwnProperty('prototype'); // true
-({}).hasOwnProperty('prototype'); // false
+(function () {}.hasOwnProperty('prototype')); // true
+({}.hasOwnProperty('prototype')); // false
 [].hasOwnProperty('prototype'); // false
 ```
 
@@ -182,14 +182,14 @@ p1.__proto__ === Object.getPrototypeOf(p1); // true
 ```js
 // 화살표 함수
 const Car = (brand) => {
-	this.brand = brand;
+  this.brand = brand;
 };
 Car.hasOwnProperty('prototype'); // false
 Car.prototype; // undefined
 
 // ES6 메서드 축약 표현
 const obj = {
-	foo() {},
+  foo() {},
 };
 
 obj.foo.hasOwnProperty('prototype'); // false
@@ -209,7 +209,7 @@ obj.foo.prototype; // undefined
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 const me = new Person('Kim');
@@ -236,7 +236,7 @@ me.constructor === Person; // true
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 const me = new Person('Kim');
 me.constructor === Person; // true
@@ -268,7 +268,7 @@ me.constructor === Person; // true
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 Person.prototype.__proto__ === Object.prototype; // true
 ```
@@ -326,9 +326,30 @@ obj.hasOwnProperty('x'); // true
 
 ## 19.7 프로토타입 체인
 
+- 프로토타입 체인 : 자바스크립트는 객체의 프로퍼티(메서드 포함)에 접근하려고 할 때 해당 객체에 접근하려는 프로퍼티가 없다면 `[[Prototype]]` 내부 슬롯의 참조를 따라 자신의 부모 역할을 하는 프로토타입의 `[[Prototype]]` 내부 슬롯의 참조를 따라 자신의 부모 역할을 하는 프로토타입의 프로퍼티를 순차적으로 검색한다. 이를 프로토타입 체인이라 한다.
+
+### 프로로타입 체인과 스코프 체인의 관계
+
+프로토타입 체인은 상속과 프로퍼티 검색을 위한 매커니즘이며, 스코프 체인은 식별자 검색을 위한 매커니즘이다. 스코프 체인과 프로토타입 체인은 서로 연관없이 별도로 동작하는 것이 아니라 서로 협력하여 식별자와 프로퍼티를 검색하는 데 사용된다.
+예를 들어, 어떠한 객체의 특정 프로퍼티의 존재 여부를 확인하기 위해 `hasOwnProperty` 메서드를 호출하는 경우 우선 스코프 체인에서 해당 객체의 식별자를 검색한 다음, 해당 객체의 프로토타입 체인에서 hasOwnPropery 메서드를 검색한다.
+
+```jsx
+// 먼저 스코프 체인에서 me 식별자를 검색한다.
+// me 식별자를 스코프 체인에서 찾으면 me 객체의 프로토타입 체인에서
+// hasOwnProperty 메서드를 검색한다.
+me.hasOwnProperty('name');
+```
+
 ## 19.8 오버라이딩과 프로퍼티 섀도잉
 
+- 오버라이딩 : 상위 클래스가 가지고 있는 메서드를 하위 클래스가 재정의하여 사용하는 것
+- 프로퍼티 섀도잉 : 상속 관계에 의해 프로퍼티가 가려지는 현상
+- 하위 객체를 통해 프로토타입의 프로퍼티를 변경 또는 삭제하는 것은 불가능하다.
+- 프로토타입 프로퍼티를 변경 또는 삭제하려면 하위 객체를 통해 프로토타입 체인으로 접근하는 것이 아니라 프로토타입에 직접 접근해야 한다.
+
 ## 19.9 프로토타입의 교체
+
+프로토타입은 생성자 함수 또는 인스턴스에 의해 임의의 다른 객체로 교체할 수 있다. 즉 부모 객체인 프로토타입을 동적으로 변경할 수 있기 때문에 이러한 특징을 활용하여 객체 간의 상속 관계를 동적으로 변경할 수 있다.
 
 ### 19.9.1 생성자 함수에 의한 프로토타입의 교체
 
