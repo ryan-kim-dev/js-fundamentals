@@ -25,10 +25,10 @@
 ```js
 // 메서드 중복 생성 예시
 function Circle(radius) {
-	this.radius = radius;
-	this.getArea = function () {
-		return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
-	};
+  this.radius = radius;
+  this.getArea = function () {
+    return Math.PI * this.radius ** 2; // **: 거듭제곱 연산자(좌항: 밑, 우항: 지수)
+  };
 }
 
 const circle1 = new Circle(1);
@@ -40,10 +40,10 @@ console.log(circle1.getArea === circle2.getArea); // false
 ```js
 // 상속에 의한 메서드 공유 예시
 function Circle(radius) {
-	this.radius = radius;
-	Circle.prototype.getArea = function () {
-		return Math.PI * this.radius ** 2;
-	};
+  this.radius = radius;
+  Circle.prototype.getArea = function () {
+    return Math.PI * this.radius ** 2;
+  };
 }
 
 const circle1 = new Circle(1);
@@ -70,7 +70,7 @@ obj.__proto__; // {constructor: ƒ, __defineGetter__: ƒ, __defineSetter__: ƒ, 
 
 // 생성자 함수에 의해 생성된 객체의 프로토타입은 생성자 함수의 `prototype` 프로퍼티에 바인딩된 객체이다.
 function User(name) {
-	this.name = name;
+  this.name = name;
 }
 const user1 = new User('kim');
 user1.__proto__ === User.prototype; // true
@@ -89,7 +89,7 @@ user1.__proto__; // {constructor: ƒ}
 ```js
 // 생성자 함수
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 // 생성자 함수 Person에 의해 생성된 객체는 Person.prototype을 자신의 프로토타입으로 갖는다.
@@ -102,7 +102,7 @@ console.log(me.__proto__.constructor === Person); // true
 
 // 프로토타입 상속
 Person.prototype.sayHi = function () {
-	console.log(`Hi! My name is ${this.name}`);
+  console.log(`Hi! My name is ${this.name}`);
 };
 
 me.sayHi(); // Hi! My name is Kim
@@ -115,7 +115,7 @@ Object.getOwnPropertyDescriptors(me); // {name: {…}}
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 console.log(Person.__proto__); // ƒ () { [native code] }
@@ -158,7 +158,7 @@ console.log(obj.__proto__ === Object.prototype); // true
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 const p1 = new Person('Kim');
@@ -171,8 +171,8 @@ p1.__proto__ === Object.getPrototypeOf(p1); // true
 일반 객체는 `prototype` 프로퍼티를 소유하지 않는다.
 
 ```js
-(function () {}).hasOwnProperty('prototype'); // true
-({}).hasOwnProperty('prototype'); // false
+(function () {}.hasOwnProperty('prototype')); // true
+({}.hasOwnProperty('prototype')); // false
 [].hasOwnProperty('prototype'); // false
 ```
 
@@ -182,14 +182,14 @@ p1.__proto__ === Object.getPrototypeOf(p1); // true
 ```js
 // 화살표 함수
 const Car = (brand) => {
-	this.brand = brand;
+  this.brand = brand;
 };
 Car.hasOwnProperty('prototype'); // false
 Car.prototype; // undefined
 
 // ES6 메서드 축약 표현
 const obj = {
-	foo() {},
+  foo() {},
 };
 
 obj.foo.hasOwnProperty('prototype'); // false
@@ -209,7 +209,7 @@ obj.foo.prototype; // undefined
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 const me = new Person('Kim');
@@ -236,7 +236,7 @@ me.constructor === Person; // true
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 const me = new Person('Kim');
 me.constructor === Person; // true
@@ -268,7 +268,7 @@ me.constructor === Person; // true
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 Person.prototype.__proto__ === Object.prototype; // true
 ```
@@ -353,7 +353,126 @@ me.hasOwnProperty('name');
 
 ### 19.9.1 생성자 함수에 의한 프로토타입의 교체
 
+```js
+const Person = (function () {
+  function Person(name) {
+    this.name = name;
+  }
+
+  // 생성자 함수의 prototype 프로퍼티를 통해 프로토타입을 교체
+  Person.prototype = {
+    sayHello() {
+      console.log(`Hi! My name is ${this.name}`);
+    },
+  };
+
+  return Person;
+})();
+
+const me = new Person('Kim');
+```
+
+위 예제에서 `Person.prototype`에 객체 리터럴을 할당하여 `Person` 생성자 함수가 생성할 객체의 프로토타입을 객체 리터럴로 교체하였다. 프로토타입으로 교체한 객체 리터럴에는 `constructor` 프로퍼티가 없다. 프로토타입을 교체하면서 기존에 constructor 프로퍼티와 생성자 함수 간의 연결이 파괴되었기 때문이다. 따라서 아래처럼 인스턴스 객체(`me`)의 생성자 함수를 검색하면 사용자 정의 생성자 함수(`Person`)가 아닌 `Object` 빌트인 생성자 함수가 나온다.
+
+```js
+me.constructor === Person; // false
+me.constructor === Object; // true
+```
+
+위처럼 프로토타입 교체로 인해 파괴된 constructor 프로퍼티와 생성자 함수 간의 연결을 되살리려면 아래 예제와 같이 프로로타입으로 교체한 객체 리터럴에 constructor 프로퍼티를 추가하여 프로토타입의 constructor 프로퍼티를 되살릴 수 있다.
+
+```js
+const Person = (function () {
+  function Person(name) {
+    this.name = name;
+  }
+
+  // 생성자 함수의 prototype 프로퍼티를 통해 프로토타입을 교체
+  Person.prototype = {
+    constructor: Person, // constructor 프로퍼티와 생성자 함수 간의 연결을 설정
+    sayHello() {
+      console.log(`Hi! My name is ${this.name}`);
+    },
+  };
+
+  return Person;
+})();
+
+const me = new Person('Kim');
+
+// constructor 프로퍼티가 생성자 함수를 가리킨다.
+me.constructor === Person; // true
+me.constructor === Object; // false
+```
+
 ### 19.9.2 인스턴스에 의한 프로토타입의 교체
+
+프로토타입은 생성자 함수의 prototype 프로퍼티 뿐만 아니라 인스턴스의 `__proto__` 접근자 프로퍼티 또는 `Object.getPrototypeOf` 메서드로 접근할 수 있다.
+따라서 인스턴스의 `__proto__` 접근자 프로퍼티 또는 `Object.setPrototypeOf` 메서드를 통해 프로토타입을 교체할 수 있다.
+생성자 함수의 prototype 프로퍼티에 다른 임의의 객체를 바인딩 하는 것은 미래에 생성할 인스턴스의 프로토타입을 교체하는 것이고, 인스턴스의 `__proto__` 접근자 프로퍼티 또는 `Object.setPrototypeOf` 메서드를 통해 프로토타입을 교체하는 것은 이미 생성된 인스턴스의 프로토타입을 교체하는 것이다.
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+const me = new Person('Kim');
+
+// 프로토타입으로 교체할 객체
+const parent = {
+  sayHello() {
+    console.log(`Hi! My name is ${this.name}`);
+  },
+};
+
+// me 객체의 프로토타입을 parent 객체로 교체한다.
+Object.setPrototypeOf(me, parent); // me.__proto__ = parent; 와 동일하게 동작함
+
+me.sayHello(); // Hi! My name is Kim
+```
+
+인스턴스에 의한 프로토타입의 교체인 경우에도 생성자 함수에 의한 프로토타입 교체의 경우와 마찬가지로 프로토타입으로 교체한 객체에는 constructor 프로퍼티가 없으므로 constructor 프로퍼티와 생성자 함수 간의 연결이 파괴된다. 따라서 아래처럼 인스턴스 객체(`me`)의 생성자 함수를 검색하면 사용자 정의 생성자 함수(`Person`)가 아닌 `Object` 빌트인 생성자 함수가 나온다.
+
+```js
+me.constructor === Person; // false
+me.constructor === Object; // true
+```
+
+위처럼 프로토타입 교체로 인해 파괴된 constructor 프로퍼티와 생성자 함수 간의 연결을 되살리려면 아래 예제와 같이 프로로타입으로 교체한 객체 리터럴에 constructor 프로퍼티를 추가하고 생성자 함수의 prototype 프로퍼티를 재설정하여 파괴된 생성자 함수와 프로토타입 간의 연결을 되살릴 수 있다.
+
+```js
+function Person(name) {
+  this.name = name;
+}
+
+const me = new Person('Kim');
+
+// 프로토타입으로 교체할 객체
+const parent = {
+  constructor: Person, // constructor 프로퍼티와 생성자 함수 간의 연결을 설정
+  sayHello() {
+    console.log(`Hi! My name is ${this.name}`);
+  },
+};
+
+// 생성자 함수의 prototype 프로퍼티와 프로토타입 간의 연결을 설정
+Person.prototype = parent;
+
+// me 객체의 프로토타입을 parent 객체로 교체한다.
+Object.setPrototypeOf(me, parent); // me.__proto__ = parent; 와 동일하게 동작함
+
+me.sayHello(); // Hi! My name is Kim
+
+// constructor 프로퍼티가 생성자 함수를 가리킨다.
+console.log(me.constructor === Person); // true
+console.log(me.constructor === Object); // false
+
+// 생성자 함수의 prototype 프로퍼티가 교체된 프로토타입을 가리킨다.
+console.log(Person.prototype === Object.getPrototypeOf(me)); // true
+```
+
+이처럼 프로토타입 교체를 통해 객체 간의 상속 관계를 동적으로 변경하는 것은 꽤나 번거로우므로 직접 교체하지 않는 것이 좋다.
+상속 관계를 인위적으로 설정하는 것은 직접 상속 방식이 더 편리하고 안전하다. 또는 ES6의 클래스를 사용하는 것도 좋은 방법이다.
 
 ## 19.10 instanceof 연산자
 
@@ -387,7 +506,7 @@ instanceof 연산자는 해당 객체와 생성자 함수간의 직접적인 연
 
 ```js
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 const me = new Person('Kim');
@@ -420,18 +539,18 @@ console.log(me instanceof Object); // true
 
 /** 예시용 생성자 함수 */
 const Person = (function () {
-	function Person(name) {
-		this.name = name;
-	}
+  function Person(name) {
+    this.name = name;
+  }
 
-	// 생성자 함수의 prototype 프로퍼티를 통해 프로토타입 교체
-	Person.prototype = {
-		sayHello() {
-			console.log(`Hi! My name is ${this.name}`);
-		},
-	};
+  // 생성자 함수의 prototype 프로퍼티를 통해 프로토타입 교체
+  Person.prototype = {
+    sayHello() {
+      console.log(`Hi! My name is ${this.name}`);
+    },
+  };
 
-	return Person;
+  return Person;
 })();
 
 /** 예시용 인스턴스 */
@@ -439,18 +558,18 @@ const me = new Person('Kim');
 
 // instanceof 연산자의 동작을 흉내낸 함수
 function isInstanceof(instance, constructor) {
-	// 프로토타입 취득
-	const prototype = Object.getPrototypeOf(instance);
+  // 프로토타입 취득
+  const prototype = Object.getPrototypeOf(instance);
 
-	// 재귀 탈출 조건
-	// prototype이 null이면 프로토타입 체인의 종점에 다다른 것이다.
-	if (prototype === null) return false;
+  // 재귀 탈출 조건
+  // prototype이 null이면 프로토타입 체인의 종점에 다다른 것이다.
+  if (prototype === null) return false;
 
-	// 프로토타입이 생성자 함수의 prototype 프로퍼티에 바인딩된 객체라면 true를 반환한다.
-	// 아니라면 재귀 호출로 프로토타입 체인 상의 상위 프로토타입으로 이동하여 확인한다.
-	return (
-		prototype === constructor.prototype || isInstanceof(prototype, constructor)
-	);
+  // 프로토타입이 생성자 함수의 prototype 프로퍼티에 바인딩된 객체라면 true를 반환한다.
+  // 아니라면 재귀 호출로 프로토타입 체인 상의 상위 프로토타입으로 이동하여 확인한다.
+  return (
+    prototype === constructor.prototype || isInstanceof(prototype, constructor)
+  );
 }
 
 // constructor 프로퍼티와 생성자 함수 간의 연결이 파괴되어도 instanceof 연산자는 영향 X
@@ -503,7 +622,7 @@ console.log(Object.getPrototypeOf(obj) === Object.prototype); // true
 
 // obj = { x: 1 } 과 동일하다.
 obj = Object.create(Object.prototype, {
-	x: { value: 1, writable: true, enumerable: true, configurable: true },
+  x: { value: 1, writable: true, enumerable: true, configurable: true },
 });
 
 // 위 코드는 아래와 동일하다.
@@ -521,7 +640,7 @@ console.log(Object.getPrototypeOf(obj) === myProto); // true
 
 // 생성자 함수
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 // obj = new Person('Kim') 과 동일하다.
@@ -543,9 +662,9 @@ const myProto = { x: 10 };
 
 // 객체 리터럴에 의해 객체를 생성하면서 프로토타입을 지정하여 직접 상속받을 수 있다.
 const obj = {
-	y: 20,
-	// 객체를 직접 상속받는다
-	__proto__: myProto,
+  y: 20,
+  // 객체를 직접 상속받는다
+  __proto__: myProto,
 };
 
 // 위 코드는 아래와 동일함.
@@ -564,19 +683,19 @@ console.log(Object.getPrototypeOf(obj) === myProto); // true
 ```js
 // 생성자 함수
 function Person(name) {
-	this.name = name;
+  this.name = name;
 }
 
 // 프로토타입에 메서드 추가
 Person.prototype.sayHello = function () {
-	console.log(`Hi! My name is ${this.name}`);
+  console.log(`Hi! My name is ${this.name}`);
 };
 
 // 정적 프로퍼티 추가
 Person.staticProp = 'static prop';
 // 정적 메서드 추가
 Person.staticMethod = function () {
-	console.log('staticMethod');
+  console.log('staticMethod');
 };
 
 // 인스턴스 생성
