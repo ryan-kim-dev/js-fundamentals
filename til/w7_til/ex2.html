@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>클로저가 아닌 경우2</title>
+  </head>
+  <body>
+    <script>
+      function foo() {
+        const x = 1;
+
+        function bar() {
+          debugger;
+          console.log(x);
+        }
+
+        bar();
+      }
+
+      foo();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>클로저인 경우</title>
+  </head>
+  <body>
+    <script>
+      function foo() {
+        const x = 1;
+        const y = 2;
+
+        function bar() {
+          debugger;
+          console.log(x);
+        }
+
+        return bar;
+      }
+
+      const bar = foo();
+      bar();
+    </script>
+  </body>
+</html>
