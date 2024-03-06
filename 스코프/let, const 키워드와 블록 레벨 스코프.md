@@ -115,7 +115,7 @@ console.log(foo); // 1
 ```
 
 - TDZ(Temporal Dead Zone) : 스코프의 시작부터 변수 선언문에 도달할 때까지 변수를 참조할 수 없는 구간
-- 자바스크립트는 모든 선언(var, let, const, function, function\*, class)을 호이스팅한다. 하지만 ES6에서 도입된 `let`, `const`, `class` 키워드를 사용한 선언문은 호이스팅이 발생하지 않는 것처럼 동작한다.
+- 자바스크립트는 모든 선언(var, let, const, function, function\*, class)을 호이스팅한다. 하지만 ES6에서 도입된 `let`, `const` 키워드를 사용한 선언문은 호이스팅이 발생하지 않는 것처럼 동작한다.
 
 ```js
 let foo = 1; // 전역 변수
